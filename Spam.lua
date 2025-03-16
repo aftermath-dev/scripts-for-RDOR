@@ -131,9 +131,9 @@ TextChat = "Join RDOR! .gg/RussianDOR"
 
 TextButton.MouseButton1Click:Connect(function() 
 	if spam == false then
-		Button.Text = "Spam!" spam = true
+		TextButton.Text = "Spam!" spam = true
 	else
-		Button.Text = "Stop!" spam = false
+		TextButton.Text = "Stop!" spam = false
 	end
 end)
 
