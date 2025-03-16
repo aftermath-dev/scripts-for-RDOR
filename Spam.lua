@@ -86,54 +86,63 @@ TextLabel_2.TextColor3 = Color3.fromRGB(0, 0, 0)
 TextLabel_2.TextScaled = true
 TextLabel_2.TextSize = 14.000
 TextLabel_2.TextWrapped = true
+ local UserInputService = game:GetService("UserInputService")
 
-TextButton1.Parent = Frame
-TextButton1.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-TextButton1.BorderColor3 = Color3.fromRGB(0, 0, 0)
-TextButton1.BorderSizePixel = 0
-TextButton1.Position = UDim2.new(0.179372191, 0, 0.350877196, 0)
-TextButton1.Size = UDim2.new(0, 143, 0, 34)
-TextButton1.Font = Enum.Font.Michroma
-TextButton1.Text = "Spam!"
-TextButton1.TextColor3 = Color3.fromRGB(0, 0, 0)
-TextButton1.TextScaled = true
-TextButton1.TextSize = 14.000
-TextButton1.TextWrapped = true
-TextButton1.Visible = false
+local gui = Frame
+
+local dragging
+local dragInput
+local dragStart
+local startPos
+
+local function update(input)
+	local delta = input.Position - dragStart
+	gui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+gui.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+		dragging = true
+		dragStart = input.Position
+		startPos = gui.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+gui.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		update(input)
+	end
+end)
 
 spam = false
-local function send(message)
-	if game:GetService("ReplicatedStorage"):FindFirstChild("DefaultChatSystemChatEvents") then
-		game:GetService("ReplicatedStorage").DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, All)
-	elseif game:GetService("TextChatService"):FindFirstChild("TextChannels") then
-		local channel = game:GetService("TextChatService").TextChannels:FindFirstChild("RBXGeneral")
-		if channel then
-			channel:SendAsync(message)
-		end
-	else
-		warn("Chat system not found")
-	end
-end
-
-while spam == true do
-	send("JOIN TO RDOR! .gg/russianDOR")		
-	wait(1)
-end
+TextChat = "Join RDOR! .gg/RussianDOR"
 
 TextButton.MouseButton1Click:Connect(function() 
-	spam = true
-	TextButton.Text = "Started!"
-	wait(3)
-	TextButton.Visible = false
-	TextButton1.Visible = true
+	if spam == false then
+		Button.Text = "Spam!" spam = true
+	else
+		Button.Text = "Stop!" spam = false
+	end
 end)
 
-TextButton1.MouseButton1Click:Connect(function() 
-	spam = false
-	TextButton1.Text = "Stopped!"
-	TextButton.Text = "Spam!"
-	wait(3)
-	TextButton1.Visible = false
-	TextButton.Visible = true
-end)
+
+while wait(3) do
+	if Toggle == true then
+		pcall(function()
+			game:GetService("TextChatService").TextChannels.RBXGeneral:SendAsync(TextChat)
+		end)
+   end
+end
 
